@@ -1,7 +1,8 @@
 import { loginErrorResponse } from '$lib/stores/login.store';
 import { SessionStatus, status } from '$lib/stores/status.store';
 
-const AUTH_HUB_URL = 'http://localhost:5174';
+const AUTH_HUB_URL =
+	process.env.NODE_ENV === 'production' ? 'http://auth-hub.test' : 'http://localhost:5174';
 
 let node: HTMLIFrameElement;
 

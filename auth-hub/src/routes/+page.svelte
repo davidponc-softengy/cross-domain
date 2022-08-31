@@ -25,7 +25,13 @@
 
 		if (action === Actions.Login) {
 			const { email, password } = payload;
+			// const clientId = generateClientIdentifier();
+			// fetch to API Gateway with credentials and clientId
 			if (Math.random() > 0.4) {
+				// If response failed, send message with error
+				// message error depends of status type
+				// 401 => Las credenciales no son validas
+				// 500 => Hubo un problema con su acceso, intente mas tarde.
 				event.source?.postMessage(
 					{ action, payload: { error: 'Las credenciales no son validas' } },
 					// @ts-ignore
@@ -34,6 +40,7 @@
 				return;
 			}
 
+			// If responses success, get token to save and send to origin
 			localStorage.setItem('token', fakeToken);
 
 			event.source?.postMessage(
