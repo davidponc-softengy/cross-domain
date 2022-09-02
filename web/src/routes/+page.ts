@@ -1,4 +1,4 @@
-import { SessionStatus, status } from '$lib/stores/status.store';
+import { SessionStatus, sessionStatus } from '$lib/stores/status.store';
 import { redirect } from '@sveltejs/kit';
 import type { PageLoad } from './$types';
 
@@ -9,5 +9,5 @@ export const load: PageLoad = () => {
 		throw redirect(307, '/dashboard');
 	}
 
-	status.set(SessionStatus.NotLogged);
+	sessionStatus.set(SessionStatus.NotLogged);
 };

@@ -1,9 +1,10 @@
 import { writable } from 'svelte/store';
 
 export enum SessionStatus {
-	Unknown,
-	NotLogged,
-	Logged
+	Unknown = 'UNKNOWN',
+	NotLogged = 'NOT_LOGGED',
+	Logged = 'LOGGED'
 }
 
-export const status = writable(SessionStatus.Unknown);
+export const sessionStatus = writable(SessionStatus.Unknown);
+export const withPermissions = writable('LOADING');

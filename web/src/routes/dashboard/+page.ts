@@ -1,4 +1,4 @@
-import { SessionStatus, status } from '$lib/stores/status.store';
+import { SessionStatus, sessionStatus } from '$lib/stores/status.store';
 import { redirect } from '@sveltejs/kit';
 import type { PageLoad } from './$types';
 
@@ -10,10 +10,10 @@ export const load: PageLoad = () => {
 	}
 
 	const payload = token.split('.')[1];
-	const decoded = atob(payload);
+	const decoded = window.atob(payload);
 	const parsed = JSON.parse(decoded);
 
-	status.set(SessionStatus.Logged);
+	sessionStatus.set(SessionStatus.Logged);
 
 	return {
 		user: {

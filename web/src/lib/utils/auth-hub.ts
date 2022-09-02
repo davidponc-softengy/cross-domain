@@ -1,16 +1,16 @@
+import { dev } from '$app/environment';
 import { loginErrorResponse } from '$lib/stores/login.store';
-import { SessionStatus, status } from '$lib/stores/status.store';
+import { SessionStatus, sessionStatus, withPermissions } from '$lib/stores/status.store';
 
-const AUTH_HUB_URL =
-	process.env.NODE_ENV === 'production' ? 'http://auth-hub.test' : 'http://localhost:5174';
+const AUTH_HUB_URL = dev ? 'http://localhost:5173' : 'http://auth-hub.test';
 
 let node: HTMLIFrameElement;
 
 export enum Actions {
-	Loaded,
-	Syncronize,
-	Login,
-	Logout
+	Loaded = 'LOADED',
+	Syncronize = 'SYNCRONIZE',
+	Login = 'LOGIN',
+	Logout = 'LOGOUT'
 }
 
 function initialize() {
@@ -29,17 +29,27 @@ const handleMessages = async (event: MessageEvent) => {
 	const { action, payload } = event.data;
 
 	if (action === Actions.Loaded) {
+		if (!payload.hasPermissions) {
+			const hub = window.open(`${AUTH_HUB_URL}/?sync=true`);
+			if (!hub || hub.closed || typeof hub.closed == 'undefined') {
+				withPermissions.set('DENIED');
+			}
+
+			return;
+		}
+
 		send(Actions.Syncronize);
 	}
 
 	if (action === Actions.Syncronize) {
 		if (payload.token) {
 			localStorage.setItem('token', payload.token);
-			status.set(SessionStatus.Logged);
+			sessionStatus.set(SessionStatus.Logged);
 		} else {
 			localStorage.removeItem('token');
-			status.set(SessionStatus.NotLogged);
+			sessionStatus.set(SessionStatus.NotLogged);
 		}
+		withPermissions.set('PERMITIED');
 	}
 
 	if (action === Actions.Login) {
@@ -49,12 +59,12 @@ const handleMessages = async (event: MessageEvent) => {
 		}
 
 		localStorage.setItem('token', payload.token);
-		status.set(SessionStatus.Logged);
+		sessionStatus.set(SessionStatus.Logged);
 	}
 
 	if (action === Actions.Logout) {
 		localStorage.removeItem('token');
-		status.set(SessionStatus.NotLogged);
+		sessionStatus.set(SessionStatus.NotLogged);
 	}
 };
 
